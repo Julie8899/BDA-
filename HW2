@@ -1,14 +1,13 @@
 #1. Historic Batting Average
 
-CREATE OR REPLACE TABLE HIS AS SELECT bc.batter as Batter, SUM(bc.Hit) / SUM(bc.atBat) as Average
-FROM batter_counts bc WHERE bc.atBat <> 0 group by bc.batter;
+CREATE OR REPLACE TABLE HIS AS SELECT bc.batter as Batter, SUM(bc.Hit) / NULLIF(SUM(bc.atBat), 0) as Average
+FROM batter_counts bc GROUP BY bc.batter;
 
 
 #2 Annual Batting Average
 
-CREATE TABLE ANNUAL as SELECT YEAR(g.local_date), bc.batter, SUM(bc.Hit) / SUM(bc.atBat) 
+CREATE OR REPLACE TABLE ANNUAL as SELECT YEAR(g.local_date), bc.batter, SUM(bc.Hit) / NULLIF(SUM(bc.atBat), 0)
 AS Average FROM batter_counts bc JOIN game g ON bc.game_id = g.game_id
-WHERE bc.atBat <> 0
 GROUP BY YEAR(g.local_date), bc.batter;
 
 
@@ -20,11 +19,10 @@ FROM game g JOIN batter_counts bc
 ON g.game_id = bc.game_id;
 
 CREATE OR REPLACE TABLE batter_Result 
-SELECT bt.batter, SUM(bt.Hit) / SUM(bt.atBat) AS Average, bt.local_date 
+SELECT bt.batter, SUM(bt.Hit) / NULLIF(SUM(bt.atBat), 0) AS Average, bt.local_date 
 FROM batter_TEST bt JOIN batter_TEST bt2 ON bt.batter = bt2.batter 
-AND bt2.local_date 
-BETWEEN DATE_SUB(bt.local_date, INTERVAL 100 DAY) AND bt.local_date 
-WHERE bt.atBat <> 0 
+AND (bt2.local_date BETWEEN DATE_SUB(bt.local_date, INTERVAL 100 DAY) AND bt.local_date) 
+# WHERE bt.batter in ('425902', '407832')  # Specify batter is only for testing. 
 GROUP BY bt.batter, bt.local_date;
 
 
