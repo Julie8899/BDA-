@@ -1,0 +1,24 @@
+CREATE OR REPLACE TABLE HIS AS SELECT bc.batter as Batter, SUM(bc.Hit) / SUM(bc.atBat) as Average
+FROM batter_counts bc WHERE bc.atBat <> 0 group by bc.batter;
+
+
+CREATE TABLE ANNUAL as SELECT YEAR(g.local_date), bc.batter, SUM(bc.Hit) / SUM(bc.atBat) 
+AS Average FROM batter_counts bc join game g on bc.game_id = g.game_id
+WHERE bc.atBat <> 0
+group by year(g.local_date), bc.batter;
+
+
+CREATE OR REPLACE TABLE batter_TEST 
+SELECT g.local_date, bc.batter, bc.Hit, bc.atBat
+FROM game g JOIN batter_counts bc 
+ON g.game_id = bc.game_id;
+
+CREATE OR REPLACE TABLE batter_Result 
+select bt.batter, SUM(bt.Hit) / SUM(bt.atBat) as Average, bt.local_date 
+from batter_TEST bt join batter_TEST bt2 ON bt.batter = bt2.batter 
+AND bt2.local_date 
+BETWEEN DATE_SUB(bt.local_date, INTERVAL 100 DAY) AND bt.local_date 
+WHERE bt.atBat <> 0 
+GROUP BY bt.batter, bt.local_date;
+
+
