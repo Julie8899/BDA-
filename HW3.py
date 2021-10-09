@@ -58,7 +58,10 @@ def main():
         """
     )
 
-    results.show()
+    results.createOrReplaceTempView("results_v")
+    results.persist(StorageLevel.DISK_ONLY)
+
+    results_v.show()
 
 # TRANSFORMATION
     # Split Column Transform
@@ -75,9 +78,9 @@ def main():
     )
 
     # Fit the pipeline
-    model = pipeline.fit(results)
-    results = model.transform(results)
-    results.show()
+    model = pipeline.fit(results_v)
+    results_v = model.transform(results_v)
+    results_v.show()
 
 
 if __name__ == "__main__":
