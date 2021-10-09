@@ -1,13 +1,13 @@
 import sys
 import tempfile
 
-from pyspark.sql import SparkSession
 
 import requests
 from pyspark import StorageLevel
-from pyspark.ml.classification import RandomForestClassifier
+from pyspark.ml import Pipeline
 from pyspark.ml.feature import CountVectorizer
-
+from pyspark.sql import SparkSession
+from split_column_transform import SplitColumnTransform
 
 
 def main():
@@ -61,7 +61,7 @@ def main():
     results.createOrReplaceTempView("results_v")
     results.persist(StorageLevel.DISK_ONLY)
 
-    results_v.show()
+    results.show()
 
 # TRANSFORMATION
     # Split Column Transform
@@ -78,9 +78,10 @@ def main():
     )
 
     # Fit the pipeline
-    model = pipeline.fit(results_v)
-    results_v = model.transform(results_v)
-    results_v.show()
+    model = pipeline.fit(results)
+    results = model.transform(results)
+    results.show()
+    return
 
 
 if __name__ == "__main__":
