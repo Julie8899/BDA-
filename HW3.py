@@ -58,7 +58,7 @@ def main():
         """
     )
 
-    results.createOrReplaceTempView("results_v")
+    results.createOrReplaceTempView("results")
     results.persist(StorageLevel.DISK_ONLY)
 
     results.show()
