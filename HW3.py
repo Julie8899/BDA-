@@ -1,10 +1,19 @@
 import sys
+import tempfile
 
 from pyspark.sql import SparkSession
+
+import requests
+from pyspark import StorageLevel
+from pyspark.ml.classification import RandomForestClassifier
+from pyspark.ml.feature import CountVectorizer
+
 
 
 def main():
     spark = SparkSession.builder.master("local[*]").getOrCreate()
+
+    # Load Data directly from MariaDB
 
     t_rolling_lookup_df = spark.read \
         .format("jdbc") \
@@ -29,6 +38,7 @@ def main():
         .load()
 
     # t_rolling_lookup_df.show()
+    # Create 100 days rolling query
 
     t_rolling_lookup_df.createOrReplaceTempView("t_rolling_lookup_v")
 
@@ -47,6 +57,25 @@ def main():
         """
     )
 
+    results.show()
+
+# TRANSFORMATION
+    # Split Column Transform
+    split_column_transform = SplitColumnTransform(
+    inputCols=["batter", "game_id", "local_date"], outputCol="categorical"
+    )
+    count_vectorizer = CountVectorizer(
+    inputCol="categorical", outputCol="categorical_vector"
+    )
+
+    # Pipeline Setup
+    pipeline = Pipeline(
+        stages=[split_column_transform, count_vectorizer]
+    )
+
+    # Fit the pipeline
+    model = pipeline.fit(results)
+    results = model.transform(results)
     results.show()
 
 
