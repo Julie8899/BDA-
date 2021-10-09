@@ -8,6 +8,7 @@ from pyspark.ml import Pipeline
 from pyspark.ml.feature import CountVectorizer
 from pyspark.sql import SparkSession
 from split_column_transform import SplitColumnTransform
+from pyspark.ml.feature import SQLTransformer
 
 
 def main():
@@ -49,7 +50,8 @@ def main():
             rl1.batter
             , rl1.game_id
             , rl1.local_date
-            , format_number(SUM(rl2.Hit) / SUM(rl2.atBat), 4) AS BA
+            , SUM(rl2.Hit) AS sumhit
+            , SUM(rl2.atBat) AS sumatbat
         FROM t_rolling_lookup_v rl1
         JOIN t_rolling_lookup_v rl2 ON rl1.batter = rl2.batter
         AND rl2.local_date BETWEEN DATE_SUB(rl1.local_date, 100) AND rl1.local_date
@@ -71,10 +73,16 @@ def main():
     count_vectorizer = CountVectorizer(
     inputCol="categorical", outputCol="categorical_vector"
     )
+    trans = SQLTransformer().setStatement(
+        "SELECT *, sumhit / sumatbat AS BA FROM __THIS__"
+     )
+    results_transformer = trans.transform(results)
+    results_transformer.show()
+
 
     # Pipeline Setup
     pipeline = Pipeline(
-        stages=[split_column_transform, count_vectorizer]
+        stages=[split_column_transform, count_vectorizer, trans]
     )
 
     # Fit the pipeline
