@@ -41,6 +41,7 @@ def main():
     # Create 100 days rolling query
 
     t_rolling_lookup_df.createOrReplaceTempView("t_rolling_lookup_v")
+    t_rolling_lookup_df.persist(StorageLevel.DISK_ONLY)
 
     results = spark.sql(
         """ 
