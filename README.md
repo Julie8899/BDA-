@@ -10,7 +10,7 @@
 - Update requirements: `pip-compile --output-file=requirements.txt requirements.in`
 - Install dev requirements `pip3 install -r requirements.dev.txt`
 - Install requirements `pip3 install -r requirements.txt`
-- `pre-commit install`
+- `Pre-commit install`
 
 ## Update versions
 

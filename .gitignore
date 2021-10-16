@@ -114,7 +114,7 @@ celerybeat.pid
 .env
 .idea
 .secrets
-.venv
+venv
 env/
 env.bak/
 ENV/
