@@ -1,6 +1,6 @@
 numpy
 pandas
 scikit-learn
-sklearn
 plotly
 pip-tools
+wheel
