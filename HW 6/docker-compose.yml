@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  db:
+    image: mariadb
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example #pragma: allowlist secret
+    ports:
+      - 3307:3306
+    healthcheck:
+      test: "exit 0"
+
+  ba:
+    image: ba_img
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - results:/results
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  results:
+  mysql_data:
