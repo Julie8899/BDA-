@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  db:
+    image: mariadb
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    restart: "no"
+    volumes:
+      - ./database:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example #pragma: allowlist secret
+    ports:
+      - 3308:3306
+    healthcheck:
+      test: "exit 0"
+
+  python_env:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - .:/final_project
+    depends_on:
+      - db
+    command: sh ./src/run.sh
+    # command: tail -F anything

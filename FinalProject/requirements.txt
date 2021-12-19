@@ -1,0 +1,10 @@
+mariadb
+numpy
+pandas
+plotly
+sqlalchemy
+statsmodels
+scipy
+sklearn
+kaleido
+pymysql
